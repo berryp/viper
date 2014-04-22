@@ -19,6 +19,7 @@ import (
 
 	"github.com/BurntSushi/toml"
 	"github.com/kr/pretty"
+	sts "github.com/stretchr/stew/strings"
 	"github.com/spf13/cast"
 	jww "github.com/spf13/jwalterweatherman"
 	"gopkg.in/yaml.v1"
@@ -143,6 +144,25 @@ func Get(key string) interface{} {
 		return v
 	}
 	return v
+}
+
+func Getenv(key string) interface{} {
+	v := os.Getenv(key)
+
+	if len(v) > 0 {
+		return sts.Parse(v)
+	}
+
+	// If the key was not found in the environment, check the defaults.
+	var dv interface{}
+	var exists bool
+
+	dv, exists = defaults[strings.ToLower(key)]
+	if exists {
+		jww.TRACE.Println(key, "found in default:", dv)
+	}
+
+	return dv
 }
 
 func IsSet(key string) bool {

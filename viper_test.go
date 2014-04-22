@@ -7,6 +7,7 @@ package viper
 
 import (
 	"bytes"
+	"os"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -114,4 +115,16 @@ func TestAliasesOfAliases(t *testing.T) {
 func TestRecursiveAliases(t *testing.T) {
 	RegisterAlias("Baz", "Roo")
 	RegisterAlias("Roo", "baz")
+}
+
+func TestGetenv(t *testing.T) {
+	os.Setenv("VIPER_GETENV_VAR", "42")
+	assert.Equal(t, 42, Getenv("VIPER_GETENV_VAR"))
+}
+
+func TestGetenvDefault(t *testing.T) {
+	key := "VIPER_TEST_GETENV_DEFAULT"
+	assert.NotEqual(t, key, Getenv(key))
+	SetDefault(key, 1)
+	assert.Equal(t, 1, Getenv(key))
 }
