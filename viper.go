@@ -99,6 +99,7 @@ func find(key string) interface{} {
 
 	// if the requested key is an alias, then return the proper key
 	key = realKey(key)
+	key = realKey(strings.ToLower(key))
 
 	val, exists = override[key]
 	if exists {
@@ -122,7 +123,6 @@ func find(key string) interface{} {
 }
 
 func Get(key string) interface{} {
-	key = strings.ToLower(key)
 	v := find(key)
 
 	if v == nil {
