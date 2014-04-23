@@ -19,7 +19,6 @@ import (
 
 	"github.com/BurntSushi/toml"
 	"github.com/kr/pretty"
-	sts "github.com/stretchr/stew/strings"
 	"github.com/spf13/cast"
 	jww "github.com/spf13/jwalterweatherman"
 	"gopkg.in/yaml.v1"
@@ -97,14 +96,22 @@ func find(key string) interface{} {
 	var val interface{}
 	var exists bool
 
+	envKey := key
+
 	// if the requested key is an alias, then return the proper key
-	key = realKey(key)
 	key = realKey(strings.ToLower(key))
 
 	val, exists = override[key]
 	if exists {
 		jww.TRACE.Println(key, "found in override:", val)
 		return val
+	}
+
+	// Environment variables should override config file values.
+	envVal := os.Getenv(envKey)
+	if len(envVal) > 0 {
+		jww.TRACE.Println(key, "found in environment:", envVal)
+		return envVal
 	}
 
 	val, exists = config[key]
@@ -144,25 +151,6 @@ func Get(key string) interface{} {
 		return v
 	}
 	return v
-}
-
-func Getenv(key string) interface{} {
-	v := os.Getenv(key)
-
-	if len(v) > 0 {
-		return sts.Parse(v)
-	}
-
-	// If the key was not found in the environment, check the defaults.
-	var dv interface{}
-	var exists bool
-
-	dv, exists = defaults[strings.ToLower(key)]
-	if exists {
-		jww.TRACE.Println(key, "found in default:", dv)
-	}
-
-	return dv
 }
 
 func IsSet(key string) bool {

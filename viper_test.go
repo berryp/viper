@@ -119,12 +119,12 @@ func TestRecursiveAliases(t *testing.T) {
 
 func TestGetenv(t *testing.T) {
 	os.Setenv("VIPER_GETENV_VAR", "42")
-	assert.Equal(t, 42, Getenv("VIPER_GETENV_VAR"))
+	assert.Equal(t, 42, GetInt("VIPER_GETENV_VAR"))
 }
 
 func TestGetenvDefault(t *testing.T) {
 	key := "VIPER_TEST_GETENV_DEFAULT"
-	assert.NotEqual(t, key, Getenv(key))
+	assert.NotEqual(t, key, Get(key))
 	SetDefault(key, 1)
-	assert.Equal(t, 1, Getenv(key))
+	assert.Equal(t, 1, GetInt(key))
 }
